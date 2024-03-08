@@ -47,6 +47,10 @@ def git_log():
         # Split each line into commit hash, author name, date, and commit message
         commit_hash, author_name, date, commit_msg = line.split('|')
 
+        # Skip the line if the commit message contains "Merge pull request"
+        if "Merge pull request" in commit_msg:
+            continue
+        
         # Get the diffstat for the commit
         diffstat = subprocess.check_output(['git', 'diff', '-w', commit_hash, commit_hash + '^', '--stat'])
         diffstat = diffstat.decode('utf-8').strip()
