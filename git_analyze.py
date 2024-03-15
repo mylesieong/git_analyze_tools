@@ -32,9 +32,9 @@ def get_deletions_number(commit_stats):
     else:
         return 0
 
-def git_log():
+def git_log(commit_number):
     # Run 'git log --stat' command and capture the output
-    git_log_output = subprocess.check_output(['git', 'log', '-100', '--date=short', '--pretty=format:%h|%an|%ad|%s'])
+    git_log_output = subprocess.check_output(['git', 'log', '-' + commit_number, '--date=short', '--pretty=format:%h|%an|%ad|%s'])
     git_log_output = git_log_output.decode('utf-8').strip()
 
     # Split each line of git log output
@@ -110,13 +110,16 @@ def generate_contribution_table(log_data, type_data):
     return contribution_table
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python script_name.py [c|a|d|t]")
+    if len(sys.argv) < 3:
+        print("Usage: python git_analyze.py [c|a|d|t] $commit_number")
+        print("[example] python git_analyze.py c 250") 
+        print("[example] python git_analyze.py t 50") 
         return
 
     type_data = sys.argv[1]
+    commit_number = sys.argv[2]
     try:
-        log_data = git_log()
+        log_data = git_log(commit_number)
         contribution_table = generate_contribution_table(log_data, type_data)
         print(contribution_table)
     except subprocess.CalledProcessError as e:
