@@ -105,7 +105,6 @@ def generate_contribution_table(log_data, type_data):
     # Pivot the data to transform authors into columns and dates into rows
     contribution_table = contributions.pivot(index='Date', columns='Author')
 
-    contribution_table.fillna('-', inplace=True)
 
     return contribution_table
 
@@ -121,7 +120,18 @@ def main():
     try:
         log_data = git_log(commit_number)
         contribution_table = generate_contribution_table(log_data, type_data)
-        print(contribution_table)
+
+        # Print the details
+        display_details = contribution_table.copy()
+        display_details.fillna('-', inplace=True)
+        print(display_details)
+
+        # Print the summary
+        total_contributions = contribution_table.sum(axis=0, skipna=True)
+        print("Summary of Contributions:")
+        for author, total in total_contributions.items():
+            print(f"{author}: {total}")
+
     except subprocess.CalledProcessError as e:
         print("Error running 'git log' command:", e)
     except Exception as e:
